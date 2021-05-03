@@ -1,0 +1,74 @@
+image: node:lts-alpine
+before_script :
+  - echo "set job timeout to minimal (10 m)"
+
+cache:
+  paths:
+    - front/node_modules/
+
+FrontBuild:
+  stage: build
+  script:
+    - cd front
+    - npm install
+  artifacts:
+    paths:
+      - front/dist/
+    expire_in: 1 day
+
+FrontKarmaUnitTest:
+  stage: test
+  allow_failure: true
+  script:
+    - cd front
+    - apt-get update && apt-get install -y wget --no-install-recommends && \
+            wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -  && \
+            sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
+            apt-get update && \
+            apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont --no-install-recommends
+            # Dont worry about cleaning up files left after installation.
+    - npm install
+    - npm test --log-level=DEBUG
+
+FrontNgLint:
+  stage: test
+  allow_failure: true
+  script:
+    - cd front
+    - npm run lint --log-level=DEBUG
+
+FrontEsLint:
+  stage: test
+  allow_failure: true
+  script:
+    - cd front
+    - npm install eslint
+    - npx eslint -f compact ./src/**/*.ts
+
+DockerComposeBuild:
+  stage: docker
+  allow_failure: true
+  only:
+    - master
+    - dev
+  image: docker:dind
+  script:
+    - apt-get install python pip
+    - curl -L https://github.com/docker/compose/releases/download/1.8.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+    - chmod +x /usr/local/bin/docker-compose
+    - pip install docker-compose
+    - docker-compose build
+    - docker-compose up
+  #artifacts:
+    #paths:
+      #- front/dist/
+    #expire_in: 1 day
+
+stages:
+  - build
+  - test
+  - docker
+  #- integration
+  #- build_arm64
+  #- Kubernetes
+  #- deploy
