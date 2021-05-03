@@ -7,7 +7,7 @@ services:
   ngtouchfrontend:
     container_name: touchfront
     build:
-      context: './front'
+      context: './'
       dockerfile: 'Dockerfile'
     restart: always
     volumes:
