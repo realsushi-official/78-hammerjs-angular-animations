@@ -1,0 +1,16 @@
+version: '3.9'
+# Python version
+# Node version 14.9+
+
+services:
+
+  ngtouchfrontend:
+    container_name: touchfront
+    build:
+      context: './'
+      dockerfile: 'Dockerfile'
+    restart: always
+    volumes:
+      - '/app/node_modules'
+    ports:
+      - '4200:4200'
