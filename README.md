@@ -1,9 +1,10 @@
 # Episode 78 - Angular Animations + HammerJS
+Forking the tutorial
 
-Watch the [screencast]()
+## Start project
+- `docker -v`
+- `docker-compose -v`
+- `docker-compose --build up`
 
-## Usage
-
-- `git clone`
-- `npm install`
-- `ng serve`
+### tips
+- install package globally with npx
