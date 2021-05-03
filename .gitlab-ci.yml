@@ -4,23 +4,21 @@ before_script :
 
 cache:
   paths:
-    - front/node_modules/
+    - node_modules/
 
 FrontBuild:
   stage: build
   script:
-    - cd front
     - npm install
   artifacts:
     paths:
-      - front/dist/
+      - dist/
     expire_in: 1 day
 
 FrontKarmaUnitTest:
   stage: test
   allow_failure: true
   script:
-    - cd front
     - apt-get update && apt-get install -y wget --no-install-recommends && \
             wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -  && \
             sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
@@ -34,14 +32,12 @@ FrontNgLint:
   stage: test
   allow_failure: true
   script:
-    - cd front
     - npm run lint --log-level=DEBUG
 
 FrontEsLint:
   stage: test
   allow_failure: true
   script:
-    - cd front
     - npm install eslint
     - npx eslint -f compact ./src/**/*.ts
 
@@ -59,16 +55,8 @@ DockerComposeBuild:
     - pip install docker-compose
     - docker-compose build
     - docker-compose up
-  #artifacts:
-    #paths:
-      #- front/dist/
-    #expire_in: 1 day
 
 stages:
   - build
   - test
   - docker
-  #- integration
-  #- build_arm64
-  #- Kubernetes
-  #- deploy
